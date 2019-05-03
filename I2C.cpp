@@ -151,10 +151,50 @@ int raspberry_i2c::send(unsigned char *TxBuf, int length)
 	
 	error_flag=false;
 	
-	if (read(fd,TxBuf,lenght)!=lenght){
+	if (write(fd,TxBuf,lenght)!=lenght){
 		return errorMsg("Sent method received an invalid buffer length.\n");
 		
 	}
 	
 }
-// agrego una linea para comentar jijiji
+
+int raspberry_i2c::send(unsigned char RegisterAddress, unsigned char *TxBuf, int length){
+	
+	if (TxBuf==0){
+		return errorMsg("Sent method sent a null RxBuf pointer.\n")
+	}
+	
+	if (length < 1){
+		return errorMsg("Sent method received an invalid buffer length.\n");
+	}
+	
+	int i;
+	unsigned char data[length+1];
+	data[0]=RegisterAddress;
+	
+	for ( i = 0; i < length ; i++ ) {
+		data[i+1] = TxBuf[i];
+	}
+	
+	error_flag=false;
+	
+	if (write(fd,data,length+1)!=lenght+1){
+		return errorMsg("Sent method received an invalid buffer length.\n");
+		
+	}
+	
+	
+}
+
+int raspberry_i2c::send(unsigned char value){
+	if (!fd)
+		if (open_fd() == -1)
+			  return -1;
+
+	error_flag=false;
+
+	if(write(fd, &value, 1) != 1)
+		return errorMsg("i2c write error!\n");
+
+	return 1;
+}
